@@ -15,26 +15,25 @@ with open('data.json', 'r') as f:
     cookies = jsonData['cookies']
 
 # 设置代理服务器的 IP 和端口号
-socks.set_default_proxy(socks.SOCKS5, "172.16.8.1", 1080)
+socks.set_default_proxy(socks.SOCKS5, "you_ip", you_port)
 
 # 将所有的 TCP 连接都通过代理服务器进行处理
 socket.socket = socks.socksocket
 
 def flushCookie():
+    # 请求体
     reqData = {
-        'email': 'ftebox@qq.com',
-        'passwd': '369958Na',
-        'code': ''
     }
+    # 请求头
     headers = {
         'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Mobile Safari/537.36',
-        'Referer': 'https://www.freewhale.co/auth/login',
+        'Referer': 'you_url',
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
     }
 
     try:
         # 发送登录请求
-        response = requests.post('https://www.freewhale.co/auth/login', data=reqData, headers=headers, verify=False)
+        response = requests.post('url', data=reqData, headers=headers, verify=False)
         # 判断是否登录成功
         if response.status_code == 200 and '"ret":1' in response.text:
             global cookies
@@ -42,19 +41,19 @@ def flushCookie():
             # 读取cookie
             cookies = response.cookies.get_dict()
             # 将cookie写入jsonData
-            jsonData['cookies'] = cookies;
-            flushJson("cookie已刷新！");
+            jsonData['cookies'] = cookies
+            flushJson("cookie已刷新！")
         else:
             # 失败就重新登陆
             flushCookie();
     except requests.exceptions.RequestException as e:
         # 出现异常，打印异常 重新登陆
         print(e)
-        flushCookie();
+        flushCookie()
 
 
 def getData():
-    url = 'https://www.freewhale.co/user'  # 将此链接替换为您要抓取的实际链接
+    url = ''  # 将此链接替换为您要抓取的实际链接
     global cookies
     try:
         response = requests.get(url, cookies=cookies, verify=False)
@@ -67,6 +66,7 @@ def getData():
         print(e)
         getData();
     else:
+        # 分析网页 获取数据
         html = response.content
         soup = BeautifulSoup(html, 'html.parser')
 
